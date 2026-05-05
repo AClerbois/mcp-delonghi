@@ -72,4 +72,35 @@ public sealed class BrewTools(AylaApiClient api)
         await api.StopBrewAsync(ct);
         return "Stop command sent. Current beverage preparation cancelled.";
     }
+
+    [McpServerTool, Description(
+        "Returns the full recipe stored on the machine for a given beverage and user profile. " +
+        "Shows: coffee/milk/hot-water volume (mL), grind level, temperature (Low/Medium/High), " +
+        "and whether pre-ground mode is active.\n\n" +
+        "Parameters:\n" +
+        "- beverage_key: Key from get_beverages, e.g. 'espresso', 'lungo'\n" +
+        "- profile: User profile 1-3 (default 2)")]
+    public async Task<string> get_beverage_recipe(
+        [Description("Beverage key from get_beverages (e.g. 'espresso', 'cappuccino')")]
+        string beverage_key,
+        [Description("User profile 1-3 (default 2)")]
+        int profile = 2,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(beverage_key))
+            return "Error: beverage_key is required.";
+
+        if (profile is < 1 or > 3)
+            return "Error: profile must be 1, 2, or 3.";
+
+        try
+        {
+            var recipe = await api.GetBeverageRecipeAsync(beverage_key, profile, ct);
+            return JsonSerializer.Serialize(recipe, JsonOptions.Default);
+        }
+        catch (DelonghiApiException ex)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
 }

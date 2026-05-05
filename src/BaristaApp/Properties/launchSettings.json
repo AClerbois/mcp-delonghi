@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "BaristaApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "DELONGHI_EMAIL": "adrien.clerbois@outlook.com",
+        "DELONGHI_PASSWORD": "P@nais2011"
+      }
+    }
+  }
+}

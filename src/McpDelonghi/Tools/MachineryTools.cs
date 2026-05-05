@@ -23,4 +23,27 @@ public sealed class MachineryTools(AylaApiClient api)
         await api.PowerOffAsync(ct);
         return "Power-off command sent. The machine is entering standby.";
     }
+
+    [McpServerTool, Description(
+        "Switches the active user profile on the De'Longhi machine (1-4). " +
+        "Profiles store personalised recipes, favourite beverages, and settings. " +
+        "Use get_profiles to see the names of available profiles.")]
+    public async Task<string> set_active_profile(
+        [Description("Profile number to activate (1-4)")]
+        int profile,
+        CancellationToken ct = default)
+    {
+        if (profile is < 1 or > 4)
+            return "Error: profile must be between 1 and 4.";
+
+        try
+        {
+            await api.SetActiveProfileAsync(profile, ct);
+            return $"Profile {profile} activated. The machine has switched to profile {profile}.";
+        }
+        catch (DelonghiApiException ex)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
 }

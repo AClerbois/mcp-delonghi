@@ -468,6 +468,176 @@ public sealed class AylaApiClient
         return counters;
     }
 
+    // ── Extra API methods ─────────────────────────────────────────────────
+
+    /// <summary>Returns the first connected device's info (model, firmware, DSN).</summary>
+    public async Task<AylaDevice?> GetDeviceInfoAsync(CancellationToken ct = default)
+    {
+        var devices = await GetDevicesAsync(ct);
+        return devices.Count > 0 ? devices[0] : null;
+    }
+
+    /// <summary>
+    /// Reads machine settings from Ayla properties d281/d282/d283.
+    ///
+    /// ECAM machine settings packet layout (cmd 0x95):
+    ///   [0] 0xD0  [1] len-1  [2] 0x95  [3] flags  [4] sub_index  [5] setting_id  [6+] value  last-2 CRC
+    ///
+    /// Known setting IDs (byte[5]):
+    ///   0x3D = temperature unit   (byte[6]: 0=Celsius, 1=Fahrenheit)
+    ///   0x3E = auto-off timer     (byte[6]: 0=disabled, value in minutes otherwise)
+    ///   0x32 = water hardness     (byte[6]: 1-5, 1=very soft … 5=very hard)
+    /// </summary>
+    public async Task<Dictionary<string, object?>> GetMachineSettingsAsync(CancellationToken ct = default)
+    {
+        var dsn = await GetDsnAsync(ct);
+        var props = await GetPropertiesAsync(dsn,
+            ["d281_mach_sett_temperature", "d282_mach_sett_auto_off", "d283_mach_sett_water_hard"], ct);
+
+        var result = new Dictionary<string, object?>();
+
+        byte[]? Decode(string key)
+        {
+            if (!props.TryGetValue(key, out var p)) return null;
+            var v = p.TryGetString("value");
+            if (v is null || v.StartsWith('{')) return null;
+            try { return Convert.FromBase64String(v); } catch { return null; }
+        }
+
+        var tempBytes = Decode("d281_mach_sett_temperature");
+        if (tempBytes is { Length: >= 7 })
+            result["temperature_unit"] = tempBytes[6] == 0 ? "Celsius" : "Fahrenheit";
+
+        var autoOffBytes = Decode("d282_mach_sett_auto_off");
+        if (autoOffBytes is { Length: >= 7 })
+            result["auto_off_minutes"] = autoOffBytes[6] == 0 ? "disabled" : (object)autoOffBytes[6];
+
+        var waterBytes = Decode("d283_mach_sett_water_hard");
+        if (waterBytes is { Length: >= 7 })
+            result["water_hardness"] = waterBytes[6] switch
+            {
+                1 => "1 (very soft)",
+                2 => "2 (soft)",
+                3 => "3 (medium)",
+                4 => "4 (hard)",
+                5 => "5 (very hard)",
+                var v => (object)v,
+            };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Reads and parses the stored recipe for a beverage/profile combination.
+    /// Returns a human-readable dictionary of ECAM recipe parameters (TLV format).
+    /// </summary>
+    public async Task<Dictionary<string, object>> GetBeverageRecipeAsync(
+        string beverageKey, int profile = 2, CancellationToken ct = default)
+    {
+        var dsn = await GetDsnAsync(ct);
+        var allProps = await GetPropertiesAsync(dsn, ct: ct);
+
+        byte[]? recipe = null;
+        var targets = new[]
+        {
+            $"_rec_{profile}_{beverageKey}",
+            $"_{profile}_rec_{beverageKey}",
+        };
+        foreach (var (propName, prop) in allProps)
+        {
+            var val = prop.TryGetString("value");
+            if (val is null || val.StartsWith('{')) continue;
+            if (targets.Any(t => propName.Contains(t)))
+            {
+                try { recipe = Convert.FromBase64String(val); break; }
+                catch { /* skip malformed */ }
+            }
+        }
+
+        if (recipe is null)
+            throw new DelonghiApiException(
+                $"Recipe not found for '{beverageKey}' (profile {profile}). " +
+                "Use get_beverages to list available keys.");
+
+        if (recipe.Length < 8)
+            throw new DelonghiApiException($"Recipe for '{beverageKey}' is too short ({recipe.Length} bytes).");
+
+        var result = new Dictionary<string, object>
+        {
+            ["beverage_key"] = beverageKey,
+            ["profile"]      = profile,
+        };
+        if (Constants.Beverages.TryGetValue(beverageKey, out var meta))
+            result["beverage_name"] = meta.Name;
+
+        // PID names for human-readable output
+        var pidNames = new Dictionary<int, string>
+        {
+            [1]  = "coffee_ml",
+            [2]  = "grind_level",
+            [3]  = "temperature",
+            [4]  = "preground",
+            [9]  = "milk_ml",
+            [15] = "hot_water_ml",
+            [25] = "visible",
+            [28] = "accessory",
+            [31] = "iced",
+            [38] = "cold_brew_intensity",
+        };
+
+        // TLV parse: skip 6-byte header, skip 2-byte CRC
+        var raw = recipe.AsSpan(6, recipe.Length - 8);
+        int i = 0;
+        while (i < raw.Length)
+        {
+            int pid = raw[i];
+            if (Constants.BigParams.Contains(pid) && i + 2 < raw.Length)
+            {
+                int val = (raw[i + 1] << 8) | raw[i + 2];
+                if (pidNames.TryGetValue(pid, out var pname))
+                    result[pname] = val;
+                i += 3;
+            }
+            else if (i + 1 < raw.Length)
+            {
+                int val = raw[i + 1];
+                if (pidNames.TryGetValue(pid, out var pname))
+                {
+                    object friendly = (pid, val) switch
+                    {
+                        (3, 0) => "Low",
+                        (3, 1) => "Medium",
+                        (3, 2) => "High",
+                        (4, _) => val != 0,
+                        _      => (object)val,
+                    };
+                    result[pname] = friendly;
+                }
+                i += 2;
+            }
+            else break;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Switches the active user profile on the machine.
+    /// ECAM cmd 0x95 (MACHINE_SETTINGS), setting 0xEE (active profile).
+    /// Write: 0D 0B 95 F0 {profile} EE 00 00 00 00 + CRC
+    /// </summary>
+    public async Task SetActiveProfileAsync(int profile, CancellationToken ct = default)
+    {
+        if (profile is < 1 or > 4)
+            throw new DelonghiApiException("Profile must be between 1 and 4.");
+
+        var dsn = await GetDsnAsync(ct);
+        var body = new byte[] { 0x0D, 0x0B, 0x95, 0xF0, (byte)profile, 0xEE, 0x00, 0x00, 0x00, 0x00 };
+        var cmd = Crc16.AppendCrc(body);
+        await PingConnectedAsync(dsn, ct);
+        await SendCommandAsync(dsn, cmd, ct);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private async Task<HttpRequestMessage> MakeRequestAsync(HttpMethod method, string url, CancellationToken ct)

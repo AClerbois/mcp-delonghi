@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/McpDelonghi/McpDelonghi.csproj" />
+    <Project Path="src/BaristaApp/BaristaApp.csproj" />
   </Folder>
 </Solution>

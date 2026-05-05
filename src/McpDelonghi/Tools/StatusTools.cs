@@ -75,4 +75,35 @@ public sealed class StatusTools(AylaApiClient api)
         var props = await api.GetAllRawPropertiesAsync(ct);
         return JsonSerializer.Serialize(props, JsonOptions.Default);
     }
+
+    [McpServerTool, Description(
+        "Returns information about the De'Longhi machine connected to the account: " +
+        "model name, OEM model code, firmware version, DSN, and connection status.")]
+    public async Task<string> get_device_info(CancellationToken ct)
+    {
+        var device = await api.GetDeviceInfoAsync(ct);
+        if (device is null)
+            return "No De'Longhi device found in your account.";
+
+        var result = new
+        {
+            product_name       = device.ProductName,
+            oem_model          = device.OemModel,
+            dsn                = device.Dsn,
+            firmware_version   = device.SwVersion ?? "unknown",
+            connection_status  = device.ConnectionStatus,
+        };
+        return JsonSerializer.Serialize(result, JsonOptions.Default);
+    }
+
+    [McpServerTool, Description(
+        "Returns the current machine settings: temperature unit (Celsius/Fahrenheit), " +
+        "auto-off timer (minutes, 0=disabled), and water hardness level (1-5).")]
+    public async Task<string> get_machine_settings(CancellationToken ct)
+    {
+        var settings = await api.GetMachineSettingsAsync(ct);
+        if (settings.Count == 0)
+            return "Could not retrieve machine settings. Is the machine connected and powered on?";
+        return JsonSerializer.Serialize(settings, JsonOptions.Default);
+    }
 }
