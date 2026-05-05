@@ -1,0 +1,34 @@
+# Build outputs
+bin/
+obj/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# .NET / Rider / VS
+.vs/
+.idea/
+*.DotSettings.user
+TestResults/
+artifacts/
+
+# User secrets (never commit credentials)
+secrets.json
+appsettings.*.json
+
+# Environment files
+.env
+.env.*
+
+# VS Code — mcp.json may contain credentials
+.vscode/mcp.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
