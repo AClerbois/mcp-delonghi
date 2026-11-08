@@ -2,6 +2,8 @@ using BaristaApp.Api;
 using BaristaApp.Auth;
 using BaristaApp.Web;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Extensions.Apps;
+using ModelContextProtocol.Protocol;
 
 // ── Configuration ─────────────────────────────────────────────────────────────
 var builder = WebApplication.CreateBuilder(args);
@@ -27,13 +29,34 @@ builder.Services.AddSingleton<DelonghiAuthService>();
 builder.Services.AddSingleton<AylaApiClient>();
 
 // ── MCP server ────────────────────────────────────────────────────────────────
-// HTTP Streamable transport (POST /mcp) — used by the VS Code MCP Apps host.
-// The tools in BaristaApp.Tools are discovered automatically via [McpServerToolType].
+// Streamable HTTP transport (POST /mcp) — used by MCP Apps-capable hosts (VS Code, Claude…).
+// SDK 2.x / MCP 2026-07-28: the transport is *stateless by default* (no initialize handshake,
+// no Mcp-Session-Id) so the server can sit behind any plain HTTP load balancer. Clients on the
+// previous revision (2025-11-25) are still served through the automatic down-level fallback.
+// The tools in BaristaApp.Tools are discovered automatically via [McpServerToolType];
+// WithMcpApps() advertises the io.modelcontextprotocol/ui extension and wires [McpAppUi] → _meta.ui.
 builder.Services
-    .AddMcpServer()
+    .AddMcpServer(options =>
+    {
+        options.ServerInfo = new Implementation
+        {
+            Name = "barista-app",
+            Title = "De'Longhi Barista",
+            Version = "1.1.0",
+            WebsiteUrl = "https://github.com/aclerbois/mcp-delonghi",
+        };
+        options.ServerInstructions = """
+            This server controls a single De'Longhi coffee machine.
+            Prefer show_barista when the host supports MCP Apps: it renders an interactive UI
+            where the user picks the beverage. Otherwise use get_beverages then brew_beverage.
+            Check get_machine_status (ready_to_brew) before brewing; call power_on if needed.
+            Never brew more than one beverage per user request unless explicitly asked.
+            """;
+    })
     .WithHttpTransport()
     .WithToolsFromAssembly(typeof(Program).Assembly)
-    .WithResourcesFromAssembly(typeof(Program).Assembly);
+    .WithResourcesFromAssembly(typeof(Program).Assembly)
+    .WithMcpApps();
 
 var app = builder.Build();
 

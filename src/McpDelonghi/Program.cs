@@ -2,6 +2,7 @@
 using McpDelonghi.Auth;
 using McpDelonghi.Web;
 using Microsoft.Extensions.Logging;
+using ModelContextProtocol.Protocol;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,9 +27,31 @@ builder.Services.AddSingleton(_ =>
 builder.Services.AddSingleton<DelonghiAuthService>();
 builder.Services.AddSingleton<AylaApiClient>();
 
-// MCP server: stdio transport + discover all [McpServerTool] methods in this assembly
+// MCP server: stdio transport + discover all [McpServerTool] methods in this assembly.
+// SDK 2.x speaks the MCP 2026-07-28 revision and falls back to 2025-11-25 clients automatically.
 builder.Services
-    .AddMcpServer()
+    .AddMcpServer(options =>
+    {
+        options.ServerInfo = new Implementation
+        {
+            Name = "mcp-delonghi",
+            Title = "De'Longhi Coffee Link",
+            Version = typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "1.0.0",
+            WebsiteUrl = "https://github.com/aclerbois/mcp-delonghi",
+        };
+
+        // Sent to the client at connection time and typically injected as a system message,
+        // so every MCP host (VS Code, Claude, Copilot Studio…) gets the same usage guidance.
+        options.ServerInstructions = """
+            This server controls a single De'Longhi coffee machine through the Coffee Link cloud.
+            Before brewing: call get_machine_status and only proceed when ready_to_brew is true;
+            if the machine is off, call power_on and wait 30-60 seconds for it to heat up.
+            Use get_beverages to discover valid beverage keys before calling brew_beverage.
+            Never brew more than one beverage per user request unless explicitly asked.
+            stop_beverage discards the drink in progress — use it only when the user asks to cancel.
+            The De'Longhi Coffee Link mobile app must be closed while this server is in use.
+            """;
+    })
     .WithStdioServerTransport()
     .WithToolsFromAssembly(typeof(Program).Assembly);
 
