@@ -13,7 +13,7 @@ const C = {
   blue: "1A72B8", teal: "178A52", purple: "7B3A7A", rust: "C64018",
   green: "2A8A40", dim: "4A2A14",
 };
-const W = 10, H = 5.625, TOTAL = 16;
+const W = 10, H = 5.625, TOTAL = 17;
 
 function fillBg(s, c=C.bg){ s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:W,h:H,fill:{color:c},line:{color:c}}); }
 function leftBar(s){ s.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:0.4,h:H,fill:{color:C.rust},line:{color:C.rust}}); }
@@ -58,7 +58,7 @@ function pageNum(sl,num,total){
   s.addText("pour en faire un MCP",{x:0.7,y:2.72,w:7.2,h:0.72,fontSize:25,fontFace:"Georgia",italic:true,color:C.gold,align:"left"});
   s.addShape(pres.shapes.LINE,{x:0.7,y:3.54,w:6.2,h:0,line:{color:C.dim,width:0.75}});
   s.addText("Adrien Clerbois  -  2026",{x:0.7,y:3.7,w:6.2,h:0.35,fontSize:12,color:C.muted,align:"left",margin:0});
-  const tags=["APK Reverse Engineering","Network Tracing","ECAM Binary Protocol","MCP + .NET 10"];
+  const tags=["APK Reverse Engineering","Network Tracing","ECAM Binary Protocol","MCP 2026-07 + .NET"];
   tags.forEach((t,i)=>{
     const tx=0.7+i*2.25;
     s.addShape(pres.shapes.RECTANGLE,{x:tx,y:4.22,w:2.1,h:0.32,fill:{color:C.card},line:{color:C.gold,width:0.4}});
@@ -74,11 +74,11 @@ function pageNum(sl,num,total){
   // Definition banner
   s.addShape(pres.shapes.RECTANGLE,{x:0.65,y:1.05,w:9.1,h:0.7,fill:{color:C.card},line:{color:C.rust,width:0.75}});
   s.addShape(pres.shapes.RECTANGLE,{x:0.65,y:1.05,w:0.07,h:0.7,fill:{color:C.rust},line:{color:C.rust}});
-  s.addText("Model Context Protocol - standard ouvert cree par Anthropic (nov. 2024), adopte par OpenAI, Google, Microsoft...\nComme un USB, mais pour l'IA : n'importe quel AI client peut parler a n'importe quel serveur MCP.",{x:0.85,y:1.05,w:8.8,h:0.7,fontSize:11,color:C.cream,align:"left",valign:"middle",margin:6});
+  s.addText("Model Context Protocol - standard ouvert cree par Anthropic (nov. 2024), porte depuis fin 2025 par l'Agentic AI Foundation (Linux Foundation). Spec courante : 2026-07-28.\nComme un USB, mais pour l'IA : n'importe quel AI client peut parler a n'importe quel serveur MCP.",{x:0.85,y:1.05,w:8.8,h:0.7,fontSize:11,color:C.cream,align:"left",valign:"middle",margin:6});
   // Flow diagram
   const MNODES=[
-    {x:0.65,label:"AI Client",sub:"Copilot / Claude\nCursor / Windsurf",color:C.blue},
-    {x:3.7, label:"MCP Server",sub:"McpDelonghi\n.NET 10  stdio",color:C.teal},
+    {x:0.65,label:"AI Client",sub:"Copilot / Claude\nCursor / Copilot Studio",color:C.blue},
+    {x:3.7, label:"MCP Server",sub:"McpDelonghi\n.NET 10  stdio / HTTP",color:C.teal},
     {x:6.75,label:"Outils et Donnees",sub:"14 tools\nAPI IoT De'Longhi",color:C.gold},
   ];
   MNODES.forEach(n=>{
@@ -87,7 +87,7 @@ function pageNum(sl,num,total){
     s.addText(n.label,{x:n.x,y:2.1,w:2.65,h:0.4,fontSize:13,bold:true,color:C.cream,align:"center",margin:0});
     s.addText(n.sub,{x:n.x,y:2.54,w:2.65,h:0.5,fontSize:9.5,color:C.muted,align:"center",margin:0});
   });
-  hArrow(s,0.65+2.65,2.56,3.7,"JSON-RPC 2.0\nstdio / HTTP-SSE");
+  hArrow(s,0.65+2.65,2.56,3.7,"JSON-RPC 2.0\nstdio / HTTP");
   hArrow(s,3.7+2.65,2.56,6.75,"tool_call\nresult");
   // 3 primitives
   const MPRIMS=[
@@ -104,7 +104,7 @@ function pageNum(sl,num,total){
     s.addShape(pres.shapes.LINE,{x:x+0.15,y:4.29,w:2.68,h:0,line:{color:C.dim,width:0.4}});
     s.addText(p.desc,{x:x+0.15,y:4.37,w:2.72,h:0.75,fontSize:9.5,color:C.muted,margin:0});
   });
-  s.addNotes("Avant de plonger dans le hack, quelques mots sur ce qu'est le MCP.\n\nModel Context Protocol est un standard ouvert cree par Anthropic en novembre 2024. L'idee : definir un protocole universel pour connecter les AI agents aux outils et donnees du monde reel.\n\nL'analogie parfaite : USB. Avant l'USB, chaque peripherique avait son propre connecteur. Avec l'USB, un standard unique. MCP fait pareil pour l'IA : n'importe quel client MCP - GitHub Copilot, Claude Desktop, Cursor, Windsurf - peut utiliser n'importe quel serveur MCP.\n\nLe protocole utilise JSON-RPC 2.0. La communication se fait via stdio pour les serveurs locaux - comme le notre - ou HTTP-SSE pour les serveurs distants.\n\nTrois primitives : les Tools que l'IA peut appeler - brew_beverage, get_machine_status, etc. Les Resources que l'IA peut lire. Et les Prompts - des templates reutilisables.\n\nAdopte tres rapidement par OpenAI, Google, Microsoft, Mistral - c'est aujourd'hui le standard de facto pour connecter les AI agents au monde reel.");
+  s.addNotes("Avant de plonger dans le hack, quelques mots sur ce qu'est le MCP.\n\nModel Context Protocol est un standard ouvert cree par Anthropic en novembre 2024, et confie fin 2025 a l'Agentic AI Foundation, sous la Linux Foundation, avec OpenAI, Google, Microsoft et les autres acteurs du secteur. L'idee : definir un protocole universel pour connecter les AI agents aux outils et donnees du monde reel.\n\nL'analogie parfaite : USB. Avant l'USB, chaque peripherique avait son propre connecteur. Avec l'USB, un standard unique. MCP fait pareil pour l'IA : n'importe quel client MCP - GitHub Copilot, Claude, Cursor, Copilot Studio - peut utiliser n'importe quel serveur MCP.\n\nLe protocole utilise JSON-RPC 2.0. La communication se fait via stdio pour les serveurs locaux - comme le notre - ou Streamable HTTP pour les serveurs distants. L'ancien transport HTTP+SSE est deprecie, et depuis la spec du 28 juillet 2026 le coeur du protocole est stateless : plus de handshake initialize ni de session, chaque requete se suffit a elle-meme. On y revient apres l'implementation.\n\nTrois primitives : les Tools que l'IA peut appeler - brew_beverage, get_machine_status, etc. Les Resources que l'IA peut lire - c'est aussi par la que passe l'UI de notre MCP App. Et les Prompts - des templates reutilisables.\n\nC'est aujourd'hui le standard de facto pour connecter les AI agents au monde reel : plus de 40 000 serveurs dans le registre officiel a l'automne 2026.");
 }
 
 // SLIDE 3 - La machine
@@ -315,10 +315,10 @@ function pageNum(sl,num,total){
 
 // SLIDE 9 - Construire le serveur MCP
 {
-  const s=contentSlide("Construire le serveur MCP en C# (.NET 10)","IMPLEMENTATION");
+  const s=contentSlide("Construire le serveur MCP en C# (.NET 10, SDK 2.x)","IMPLEMENTATION");
   pageNum(s,10,TOTAL);
   const cards=[
-    {icon:"SDK",color:C.blue,title:"ModelContextProtocol SDK",code:"AddMcpServer()\n .WithStdioServerTransport()\n .WithToolsFromAssembly()",note:"Enregistrement automatique\ndes outils par reflexion .NET"},
+    {icon:"SDK",color:C.blue,title:"ModelContextProtocol SDK 2.4",code:"AddMcpServer(o => o.ServerInstructions = ...)\n .WithStdioServerTransport()\n .WithToolsFromAssembly()",note:"Outils decouverts par reflexion .NET\nServerInstructions lues par tout host"},
     {icon:"ATT",color:C.teal,title:"Pattern Tool Attribute",code:"[McpServerToolType]\n[McpServerTool]\n[Description(\"...\")]",note:"Chaque methode C# devient\nun outil MCP expose au modele"},
     {icon:"AUTH",color:C.gold,title:"Auth + Client IoT",code:"DelonghiAuthService\nAylaApiClient\nEcamPacket / Crc16",note:"Token cache thread-safe\nFallback app/data_request"},
   ];
@@ -333,16 +333,42 @@ function pageNum(sl,num,total){
     s.addShape(pres.shapes.LINE,{x:x+0.2,y:3.62,w:2.52,h:0,line:{color:C.dim,width:0.4}});
     s.addText(c.note,{x:x+0.12,y:3.7,w:2.68,h:0.72,fontSize:9.5,color:C.muted,align:"center",margin:0});
   });
-  s.addNotes("Cote implementation MCP, le SDK .NET est remarquablement simple a prendre en main.\n\nTrois lignes dans Program.cs : AddMcpServer(), WithStdioServerTransport() - le serveur communique en JSON-RPC sur stdin/stdout, c'est le standard MCP - et WithToolsFromAssembly() pour l'auto-decouverte.\n\nLe framework scanne l'assembly a la recherche des classes marquees [McpServerToolType]. Les methodes avec [McpServerTool] deviennent des outils. Le [Description(...)] sur la methode et sur chaque parametre devient la documentation que le modele de langage lit pour savoir quoi appeler.\n\nResultat : le modele voit directement 'brew_beverage - brews a beverage on the De'Longhi machine', avec les parametres documentes. Zero configuration supplementaire.");
+  s.addNotes("Cote implementation MCP, le SDK .NET est remarquablement simple a prendre en main. Le projet tourne sur le SDK officiel ModelContextProtocol 2.4 - la 1.0 stable est sortie en mars 2026, la 2.0 le 28 juillet avec la nouvelle spec.\n\nTrois lignes dans Program.cs : AddMcpServer(), WithStdioServerTransport() - le serveur communique en JSON-RPC sur stdin/stdout, c'est le standard MCP pour un serveur local - et WithToolsFromAssembly() pour l'auto-decouverte.\n\nNouveaute depuis la version de mai : les ServerInstructions. C'est un texte envoye au client a la connexion, que le host injecte generalement comme message systeme. Ici : verifier get_machine_status avant de brasser, un seul cafe par demande, fermer l'app Coffee Link. Un seul endroit, et VS Code, Claude ou Copilot Studio recoivent tous la meme consigne.\n\nLe framework scanne l'assembly a la recherche des classes marquees [McpServerToolType]. Les methodes avec [McpServerTool] deviennent des outils. Le [Description(...)] sur la methode et sur chaque parametre devient la documentation que le modele de langage lit pour savoir quoi appeler.\n\nResultat : le modele voit directement 'brew_beverage - brews a beverage on the De'Longhi machine', avec les parametres documentes. Zero configuration supplementaire.");
+}
+
+// SLIDE 9bis - Depuis mai 2026 : ce qui a change
+{
+  const s=contentSlide("Depuis mai 2026 : ce qui a change cote MCP et .NET","NOUVEAUTES 2026");
+  pageNum(s,11,TOTAL);
+  const NEWS=[
+    {tag:"SPEC",color:C.rust,title:"MCP 2026-07-28 : stateless",desc:"Plus de handshake initialize ni de Mcp-Session-Id.\nVersion et capabilities dans _meta a chaque requete,\nserver/discover, headers Mcp-Method / Mcp-Name.\nN'importe quelle instance derriere un load balancer."},
+    {tag:"MRTR",color:C.gold,title:"Multi Round-Trip Requests",desc:"Remplacent elicitation / sampling inities par le serveur.\nLe tool repond 'input_required', le client relance.\nIdeal pour : \"un 2e cafe, vraiment ?\" sans stream ouvert."},
+    {tag:"EXT",color:C.purple,title:"Framework d'extensions",desc:"Tasks (cafe long en polling), MCP Apps (UI barista\ndans le chat), Enterprise Managed Authorization.\nRoots, Sampling, Logging deprecies (12 mois)."},
+    {tag:"SDK",color:C.blue,title:"SDK C# 2.0 -> 2.4",desc:"HTTP stateless par defaut, fallback auto 2025-11-25.\nExtensions.Apps / .Tasks en packages opt-in.\nOAuth durci (PKCE S256, issuer). Licence MIT."},
+    {tag:".NET",color:C.teal,title:".NET 11 + C# 15",desc:"GA a .NET Conf, 10-13 nov. 2026 (STS).\nUnion types, closed, Runtime Async hors preview,\nNativeAOT plus rapide. .NET 8 et 9 : fin de vie le 10 nov."},
+    {tag:"MSFT",color:C.amber,title:"Ecosysteme Microsoft",desc:"Agent Framework 1.0 GA, Foundry Toolbox\n(un endpoint MCP pour tous les outils), Copilot Studio\nMCP en GA, Entra Agent ID pour chaque agent."},
+  ];
+  const CW=2.98,CH=2.02,GX=0.1,GY=0.14,X0=0.55,Y0=1.05;
+  NEWS.forEach((n,i)=>{
+    const col=i%3,row=Math.floor(i/3);
+    const x=X0+col*(CW+GX),y=Y0+row*(CH+GY);
+    s.addShape(pres.shapes.RECTANGLE,{x,y,w:CW,h:CH,fill:{color:C.card},line:{color:n.color,width:0.75}});
+    s.addShape(pres.shapes.RECTANGLE,{x,y,w:0.07,h:CH,fill:{color:n.color},line:{color:n.color}});
+    s.addText(n.tag,{x:x+0.18,y:y+0.1,w:0.75,h:0.3,fontSize:8,bold:true,color:n.color,charSpacing:1.5,margin:0});
+    s.addText(n.title,{x:x+0.18,y:y+0.36,w:CW-0.3,h:0.36,fontSize:11.5,bold:true,color:C.cream,margin:0});
+    s.addShape(pres.shapes.LINE,{x:x+0.18,y:y+0.76,w:CW-0.36,h:0,line:{color:C.dim,width:0.4}});
+    s.addText(n.desc,{x:x+0.18,y:y+0.82,w:CW-0.3,h:1.12,fontSize:8.5,color:C.muted,valign:"top",margin:0});
+  });
+  s.addNotes("Ce talk a ete donne une premiere fois en mai 2026. Depuis, le paysage a bouge, et c'est l'occasion de montrer qu'un serveur MCP, ca se maintient.\n\nUn : la spec du 28 juillet 2026, la plus grosse revision depuis le lancement. Le protocole devient stateless : plus de handshake initialize, plus de header Mcp-Session-Id. La version, l'identite du client et ses capabilities voyagent dans _meta a chaque requete, et server/discover permet de recuperer les capabilities du serveur a la demande. Les noms de methode et d'outil passent dans des headers HTTP, Mcp-Method et Mcp-Name, pour que les gateways routent et autorisent sans ouvrir le JSON. Consequence directe : un serveur MCP distant se deploie comme n'importe quelle API HTTP, derriere un load balancer round-robin, sans sticky session.\n\nDeux : les Multi Round-Trip Requests. Avant, un serveur qui voulait poser une question a l'utilisateur - elicitation - ou demander une completion au modele - sampling - devait tenir un stream ouvert vers le client. Maintenant le tool repond 'il me manque une info', le client complete et relance. Pour nous : demander confirmation avant le deuxieme cafe de la minute.\n\nTrois : les extensions deviennent un concept de premiere classe. Tasks sort du coeur pour devenir une extension officielle, avec du polling - parfait pour un cafe qui prend 40 secondes. MCP Apps, c'est ce qui affiche l'UI barista dans le chat. Et Enterprise Managed Authorization pour les tenants d'entreprise. En contrepartie, Roots, Sampling et Logging sont deprecies, avec une fenetre de douze mois.\n\nQuatre : le SDK C# a suivi au jour pres : 2.0 le 28 juillet, 2.4 debut novembre. Le transport HTTP est stateless par defaut, les clients encore en 2025-11-25 sont servis par un fallback automatique, Apps et Tasks sont des packages a part, et l'OAuth est durci : PKCE S256 obligatoire, validation de l'issuer.\n\nCinq : .NET 11 et C# 15 sortent a .NET Conf, du 10 au 13 novembre 2026 : union types, closed hierarchies, Runtime Async hors preview. Et attention : .NET 8 et .NET 9 arrivent en fin de support le 10 novembre.\n\nSix : cote Microsoft, tout converge vers MCP : Agent Framework 1.0 en GA, les Toolbox Foundry qui exposent tous les outils d'un agent derriere un seul endpoint MCP, les outils MCP en GA dans Copilot Studio, et chaque agent recoit desormais une identite Entra. La question 'qui a le droit de faire couler le cafe' a enfin une reponse d'entreprise.");
 }
 
 // SLIDE 10 - Architecture: Vue d'ensemble MCP
 {
   const s=contentSlide("Architecture : vue d'ensemble - de l'IA a la cafetiere","ARCHITECTURE");
-  pageNum(s,11,TOTAL);
+  pageNum(s,12,TOTAL);
   const TIERS=[
-    {y:1.08,h:0.76,color:C.blue,label:"AI Agent",sub:"GitHub Copilot  VS Code  Claude  Cursor  etc."},
-    {y:2.1,h:0.76,color:C.teal,label:"McpDelonghi Server (.NET 10)",sub:"BrewTools  StatusTools  MachineryTools  (stdio)"},
+    {y:1.08,h:0.76,color:C.blue,label:"AI Agent",sub:"GitHub Copilot  VS Code  Claude  Copilot Studio  etc."},
+    {y:2.1,h:0.76,color:C.teal,label:"McpDelonghi Server (.NET 10, SDK 2.4)",sub:"Brew / Status / Machinery tools (stdio)   |   BaristaApp : HTTP stateless + MCP App"},
     {y:3.12,h:0.76,color:C.purple,label:"Ayla Networks IoT Cloud EU",sub:"user-field-eu.aylanetworks.com  ads-eu.aylanetworks.com"},
     {y:4.14,h:0.78,color:C.rust,label:"De'Longhi Eletta Explore",sub:"WiFi Module  ECAM CPU  CRC-16 SPI-FUJITSU  Binary Protocol"},
   ];
@@ -353,7 +379,7 @@ function pageNum(sl,num,total){
     s.addText(t.sub,{x:0.75,y:t.y+0.4,w:5.5,h:0.28,fontSize:8.5,color:C.muted,margin:0});
   });
   const AX=3.4;
-  [{label:"MCP Protocol (stdio)"},{label:"HTTPS REST API"},{label:"Base64 ECAM packets"}].forEach((a,i)=>{
+  [{label:"MCP 2026-07-28 (stdio / HTTP)"},{label:"HTTPS REST API"},{label:"Base64 ECAM packets"}].forEach((a,i)=>{
     vArrow(s,AX,TIERS[i].y+TIERS[i].h,TIERS[i+1].y,a.label);
   });
   const ANNOTS=[
@@ -366,13 +392,13 @@ function pageNum(sl,num,total){
     s.addShape(pres.shapes.RECTANGLE,{x:6.65,y:a.y+0.08,w:3.05,h:a.y===TIERS[3].y?0.62:0.58,fill:{color:C.bgLight},line:{color:a.color,width:0.5}});
     s.addText(a.text,{x:6.65,y:a.y+0.08,w:3.05,h:0.6,fontSize:10,color:a.color,align:"center",valign:"middle",margin:0});
   });
-  s.addNotes("Voici la vue d'ensemble complete, de l'IA a la cafetiere.\n\nQuand je demande a Copilot de me faire un expresso, voici ce qui se passe :\n\nL'agent AI envoie un tool call JSON-RPC 2.0 au serveur MCP via stdio - c'est la communication standard du protocole MCP.\n\nLe serveur MCP traduit ca en appels REST HTTPS vers Ayla Networks, avec l'authentification JWT.\n\nAyla pousse la commande ECAM encodee en Base64 a la machine via sa connexion persistante.\n\nLa machine decode le paquet, valide le CRC-16, et execute - cafe en preparation.\n\nTout ce systeme tient dans environ 800 lignes de C#, sans dependances exotiques.");
+  s.addNotes("Voici la vue d'ensemble complete, de l'IA a la cafetiere.\n\nQuand je demande a Copilot de me faire un expresso, voici ce qui se passe :\n\nL'agent AI envoie un tool call JSON-RPC 2.0 au serveur MCP via stdio - c'est la communication standard du protocole MCP pour un serveur local. La variante BaristaApp expose les memes outils en Streamable HTTP, stateless par defaut depuis la spec 2026-07-28 : on peut l'heberger sur Azure derriere un load balancer sans sticky session, et y ajouter l'UI barista via MCP Apps.\n\nLe serveur MCP traduit ca en appels REST HTTPS vers Ayla Networks, avec l'authentification JWT.\n\nAyla pousse la commande ECAM encodee en Base64 a la machine via sa connexion persistante.\n\nLa machine decode le paquet, valide le CRC-16, et execute - cafe en preparation.\n\nTout ce systeme tient dans environ 800 lignes de C#, sans dependances exotiques.");
 }
 
 // SLIDE 11 - Les outils MCP
 {
   const s=contentSlide("Les outils MCP exposes","IMPLEMENTATION");
-  pageNum(s,12,TOTAL);
+  pageNum(s,13,TOTAL);
   const TOOLS=[
     {name:"get_machine_status",cat:"Status",color:C.teal},
     {name:"get_maintenance_info",cat:"Status",color:C.teal},
@@ -388,25 +414,27 @@ function pageNum(sl,num,total){
     {name:"power_on",cat:"Machine",color:C.rust},
     {name:"power_off",cat:"Machine",color:C.rust},
     {name:"set_active_profile",cat:"Machine NEW",color:C.gold},
+    {name:"show_barista",cat:"MCP App (HTTP)",color:C.purple},
   ];
   const COLS=7,TW=1.31,TH=0.75,SX=0.42,SY=1.05,HGAP=0.03,VGAP=0.18;
   TOOLS.forEach((t,i)=>{
     const col=i%COLS,row=Math.floor(i/COLS);
     const x=SX+col*(TW+HGAP),y=SY+row*(TH+VGAP);
-    const isNew=t.cat.includes("NEW");
-    s.addShape(pres.shapes.RECTANGLE,{x,y,w:TW,h:TH,fill:{color:C.card},line:{color:t.color,width:isNew?1.1:0.4}});
-    if(isNew) s.addShape(pres.shapes.RECTANGLE,{x,y,w:TW,h:0.07,fill:{color:C.gold},line:{color:C.gold}});
+    const isNew=t.cat.includes("NEW"), isApp=t.cat.includes("MCP App");
+    s.addShape(pres.shapes.RECTANGLE,{x,y,w:TW,h:TH,fill:{color:C.card},line:{color:t.color,width:(isNew||isApp)?1.1:0.4}});
+    if(isNew||isApp) s.addShape(pres.shapes.RECTANGLE,{x,y,w:TW,h:0.07,fill:{color:t.color},line:{color:t.color}});
     s.addText([{text:t.name,options:{bold:true,fontSize:7.5,color:C.cream,breakLine:true}},{text:t.cat,options:{fontSize:7.5,color:t.color}}],{x,y,w:TW,h:TH,align:"center",valign:"middle",margin:3});
   });
-  s.addShape(pres.shapes.LINE,{x:0.42,y:4.82,w:9.15,h:0,line:{color:C.dim,width:0.4}});
-  s.addText("NEW : Nouvel outil ajoute apres analyse APK (get_device_info, get_machine_settings, get_beverage_recipe, set_active_profile)",{x:0.42,y:4.9,w:9.15,h:0.3,fontSize:9,color:C.gold,align:"left",margin:0});
-  s.addNotes("Le serveur expose 14 outils au total, en trois categories.\n\nStatus : tout ce qui concerne l'etat de la machine - son etat courant, les alertes, les compteurs de boissons, les profils, et grace au RE de l'APK, les parametres machine comme l'unite de temperature et la durete de l'eau.\n\nBrew : get_beverages pour lister les boissons disponibles, brew_beverage pour en preparer une, stop_beverage pour annuler, et get_beverage_recipe pour voir les parametres detailles d'une recette.\n\nMachine : power_on, power_off, et set_active_profile pour changer le profil utilisateur actif.\n\nLes 4 outils NEW ont ete ajoutes directement a partir de l'analyse APK et du code DeLonghiWifiConnectService.java.");
+  s.addShape(pres.shapes.LINE,{x:0.42,y:4.62,w:9.15,h:0,line:{color:C.dim,width:0.4}});
+  s.addText("NEW : outil ajoute apres analyse APK (get_device_info, get_machine_settings, get_beverage_recipe, set_active_profile)",{x:0.42,y:4.68,w:9.15,h:0.28,fontSize:9,color:C.gold,align:"left",margin:0});
+  s.addText("MCP App : show_barista (BaristaApp, Streamable HTTP) est lie a la ressource ui://barista/app.html via [McpAppUi] - le host affiche l'UI barista dans le chat",{x:0.42,y:4.96,w:9.15,h:0.28,fontSize:9,color:C.purple,align:"left",margin:0});
+  s.addNotes("Le serveur stdio expose 14 outils, en trois categories.\n\nStatus : tout ce qui concerne l'etat de la machine - son etat courant, les alertes, les compteurs de boissons, les profils, et grace au RE de l'APK, les parametres machine comme l'unite de temperature et la durete de l'eau.\n\nBrew : get_beverages pour lister les boissons disponibles, brew_beverage pour en preparer une, stop_beverage pour annuler, et get_beverage_recipe pour voir les parametres detailles d'une recette.\n\nMachine : power_on, power_off, et set_active_profile pour changer le profil utilisateur actif.\n\nLes 4 outils NEW ont ete ajoutes directement a partir de l'analyse APK et du code DeLonghiWifiConnectService.java.\n\nEt un quinzieme, dans la variante BaristaApp en Streamable HTTP : show_barista. Il porte l'attribut [McpAppUi] de l'extension officielle MCP Apps, qui le relie a une ressource ui://barista/app.html servie en text/html;profile=mcp-app. Un host compatible - VS Code, Claude - affiche la page dans une iframe sandboxee a cote de la conversation, et l'utilisateur choisit son cafe en cliquant. Un host sans MCP Apps recoit simplement la liste des boissons en texte.");
 }
 
 // SLIDE 12 - Nouvelles fonctionnalites
 {
   const s=contentSlide("Nouvelles fonctionnalites decouvertes dans l'APK","NOUVELLES FEATURES");
-  pageNum(s,13,TOTAL);
+  pageNum(s,14,TOTAL);
   const NT=[
     {name:"get_device_info",desc:"Modele, OEM code, firmware\nDSN, statut de connexion",source:"GetDevicesAsync() -> AylaDevice\nasw_version  oem_model  dsn"},
     {name:"get_machine_settings",desc:"Unite temperature (C/F)\nMinuteur auto-off, durete eau 1-5",source:"d281_mach_sett_temperature\nd282_mach_sett_auto_off"},
@@ -448,14 +476,14 @@ function pageNum(sl,num,total){
     s.addText(st.d,{x:6.42,y:y+0.36,w:3.2,h:0.26,fontSize:8.5,color:C.muted,fontFace:"Consolas",margin:0});
     if(i<4) s.addShape(pres.shapes.LINE,{x:6.1,y:y+0.62,w:0,h:0.22,line:{color:C.gold,width:0.9,dashType:"dash"}});
   });
-  pageNum(s,14,TOTAL);
+  pageNum(s,15,TOTAL);
   s.addNotes("Place a la demonstration !\n\n[Ouvrir VS Code avec GitHub Copilot, onglet Chat]\n\nJe vais simplement demander : 'Fais-moi un expresso'.\n\nCopilot analyse la demande, selectionne l'outil brew_beverage parmi les 14 disponibles, remplit les parametres beverage_key='espresso', profile=2.\n\nLe serveur MCP construit le paquet ECAM binaire, calcule le CRC-16, encode en Base64, et POST vers Ayla.\n\nLa machine recoit la commande, valide le CRC, et commence la preparation.\n\n[Attendre le son de la machine...]\n\nCe que vous venez de voir : un chemin complet de l'intention en langage naturel a un acte physique reel, grace a APK reverse engineering + MCP.");
 }
 
 // SLIDE 14 - Ce qu'on a appris
 {
   const s=contentSlide("Ce qu'on a appris","LEARNINGS");
-  pageNum(s,15,TOTAL);
+  pageNum(s,16,TOTAL);
   const LEARN=[
     {icon:"APK",color:C.gold,title:"Les APKs sont une mine d'or",desc:"Credentials, URLs, protocoles binaires - tout est la,\nsouvent lisible dans les packages non obfusques."},
     {icon:"NET",color:C.purple,title:"Le tracing reseau confirme tout",desc:"mitmproxy sur le WiFi + certificat Android =\nvoir chaque requete en clair, sans effort."},
@@ -499,7 +527,7 @@ function pageNum(sl,num,total){
   s.addText('"The best way to understand a system is to take it apart\n- then put it back together as an AI tool."',{x:0.7,y:3.95,w:8.8,h:0.82,fontSize:12,italic:true,color:C.muted,fontFace:"Georgia",align:"center",margin:0});
   s.addShape(pres.shapes.LINE,{x:0.7,y:4.88,w:8.8,h:0,line:{color:C.dim,width:0.5}});
   s.addText("Made with reverse engineering  -  2026",{x:0.7,y:4.97,w:8.8,h:0.28,fontSize:9,color:C.dim,align:"center",margin:0});
-  pageNum(s,16,TOTAL);
+  pageNum(s,17,TOTAL);
   s.addNotes("En resume, le pipeline complet : APK -> tracing reseau -> credentials -> auth Gigya + Ayla -> protocole ECAM -> serveur MCP .NET 10 -> expresso par IA.\n\nLe code source est open source sur GitHub : github.com/AClerbois/mcp-delonghi. N'hesitez pas a forker, adapter pour votre propre machine connectee, ou contribuer de nouveaux outils.\n\nPour aller plus loin : il reste beaucoup a explorer dans l'APK - la gestion du Bean System, la configuration du WiFi, le renommage des recettes custom. Le protocole ECAM est riche.\n\nMerci pour votre attention. Des questions ?");
 }
 

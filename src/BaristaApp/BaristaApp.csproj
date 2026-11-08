@@ -6,15 +6,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>BaristaApp</RootNamespace>
+    <!-- MCP Apps is still experimental in the SDK (MCPEXP003) -->
+    <NoWarn>$(NoWarn);MCPEXP003</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <!--
-      ModelContextProtocol       — core SDK (tools, MCP protocol)
-      ModelContextProtocol.AspNetCore — MapMcp() / HTTP Streamable transport
+      ModelContextProtocol                 — core SDK (tools, resources, MCP protocol)
+      ModelContextProtocol.AspNetCore      — MapMcp() / Streamable HTTP transport (stateless by default in 2.x)
+      ModelContextProtocol.Extensions.Apps — MCP Apps extension ([McpAppUi], WithMcpApps(), ui:// resources)
     -->
-    <PackageReference Include="ModelContextProtocol" Version="1.2.0" />
-    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="ModelContextProtocol" Version="2.4.0" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.4.0" />
+    <PackageReference Include="ModelContextProtocol.Extensions.Apps" Version="2.4.0" />
   </ItemGroup>
 
 </Project>

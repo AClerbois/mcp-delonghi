@@ -6,6 +6,8 @@ An [MCP](https://modelcontextprotocol.io) server that lets LLMs control a **De'L
 
 Works with Claude Desktop, VS Code Copilot, Cursor, and any other MCP-compatible client.
 
+Built on the official [MCP C# SDK 2.x](https://github.com/modelcontextprotocol/csharp-sdk), which implements the **MCP 2026-07-28** specification (stateless protocol core, `server/discover`, Mcp-Method/Mcp-Name headers, extensions framework). Clients still on the 2025-11-25 revision are served through the SDK's automatic down-level fallback.
+
 ## Tools
 
 | Tool | Description |
@@ -102,6 +104,18 @@ DELONGHI_PASSWORD=yourpassword
     }
   }
 }
+```
+
+## Barista App (MCP Apps demo)
+
+`src/BaristaApp` is a second, demo-oriented server exposing a **subset** of the tools above (`get_machine_status`, `power_on`, `power_off`, `get_beverages`, `brew_beverage`, `stop_beverage`) over **Streamable HTTP** (`POST /mcp`, stateless by default), plus an interactive barista UI delivered through the [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) extension (`ModelContextProtocol.Extensions.Apps`):
+
+- `show_barista` (BaristaApp only) is annotated with `[McpAppUi(ResourceUri = "ui://barista/app.html")]`
+- the HTML is served as the `ui://barista/app.html` resource with the `text/html;profile=mcp-app` MIME type
+- `WithMcpApps()` advertises the `io.modelcontextprotocol/ui` extension; hosts without MCP Apps support fall back to the text result
+
+```sh
+dotnet run --project src/BaristaApp   # MCP endpoint on http://localhost:5200/mcp
 ```
 
 ## Protocol notes

@@ -1,4 +1,6 @@
 using BaristaApp.Api;
+using BaristaApp.Resources;
+using ModelContextProtocol.Extensions.Apps;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
@@ -12,15 +14,17 @@ namespace BaristaApp.Tools;
 /// by the embedded barista web UI via /api/beverages and /api/brew (MCP App demo).
 ///
 /// show_barista — entry-point that returns the beverage list.
-///   In a full MCP Apps host, add _meta.ui.resourceUri = "http://localhost:5200/"
-///   to the tool's schema so the host opens the barista web UI in a webview.
+///   The [McpAppUi] attribute (ModelContextProtocol.Extensions.Apps) links the tool to the
+///   ui://barista/app.html resource; WithMcpApps() in Program.cs turns it into _meta.ui so an
+///   MCP Apps-capable host renders the barista UI in a sandboxed iframe. Hosts without MCP Apps
+///   support simply get the text result.
 /// </summary>
 [McpServerToolType]
 public sealed class BaristaTools(AylaApiClient api)
 {
     [McpServerTool]
     [Description("Open the De'Longhi Barista interface to brew a coffee. Returns the list of available beverages as an interactive UI.")]
-    [McpMeta("ui", JsonValue = """{ "resourceUri": "ui://barista/app.html" }""")]
+    [McpAppUi(ResourceUri = BaristaResources.AppUri)]
     public async Task<string> show_barista(CancellationToken ct)
     {
         var beverages = await api.GetAvailableBeveragesAsync(ct);

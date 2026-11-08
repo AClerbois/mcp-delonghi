@@ -18,7 +18,10 @@ jobs:
           dotnet-version: "10.x"
 
       - name: Restore
-        run: dotnet restore src/McpDelonghi/McpDelonghi.csproj
+        run: dotnet restore McpDelonghi.slnx
 
       - name: Build
-        run: dotnet build src/McpDelonghi/McpDelonghi.csproj -c Release --no-restore
+        run: dotnet build McpDelonghi.slnx -c Release --no-restore
+
+      - name: Pack dotnet tool
+        run: dotnet pack src/McpDelonghi/McpDelonghi.csproj -c Release --no-build -o artifacts
