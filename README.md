@@ -108,9 +108,9 @@ DELONGHI_PASSWORD=yourpassword
 
 ## Barista App (MCP Apps demo)
 
-`src/BaristaApp` is a second server exposing the same tools over **Streamable HTTP** (`POST /mcp`, stateless by default) plus an interactive barista UI delivered through the [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) extension (`ModelContextProtocol.Extensions.Apps`):
+`src/BaristaApp` is a second, demo-oriented server exposing a **subset** of the tools above (`get_machine_status`, `power_on`, `power_off`, `get_beverages`, `brew_beverage`, `stop_beverage`) over **Streamable HTTP** (`POST /mcp`, stateless by default), plus an interactive barista UI delivered through the [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) extension (`ModelContextProtocol.Extensions.Apps`):
 
-- `show_barista` is annotated with `[McpAppUi(ResourceUri = "ui://barista/app.html")]`
+- `show_barista` (BaristaApp only) is annotated with `[McpAppUi(ResourceUri = "ui://barista/app.html")]`
 - the HTML is served as the `ui://barista/app.html` resource with the `text/html;profile=mcp-app` MIME type
 - `WithMcpApps()` advertises the `io.modelcontextprotocol/ui` extension; hosts without MCP Apps support fall back to the text result
 
